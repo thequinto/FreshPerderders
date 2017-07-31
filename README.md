@@ -18,7 +18,7 @@ In this README, you'll find information about:
 
 ## What To Build
 
-Build a recommendations API endpoint that retrieves top-rated film recommendations.  You have been given a suite of failing tests - make them pass.
+Build a recommendations API endpoint that retrieves top-rated film recommendations.  
 
 #### User Story
 
@@ -119,7 +119,7 @@ Specifies the first entry to be returned from the collection.
 
 ```
 
-**Failure Response** - Use the test suite for guidance on specific error messages.
+**Failure Response**
 
 ```
 {
@@ -133,9 +133,7 @@ Specifies the first entry to be returned from the collection.
 
 #### Codebase
 
-The FreshPotatoes API service will be separate from their customer-facing web application.  In this repo, you'll find the code that will power their API: starter code and tests built with Maven, Java 8, Spring Boot, JPA, and SQLite.
-
-**TODO: Maven instructions here**
+The FreshPotatoes API service will be separate from their customer-facing web application.  In this repo, you'll find the code that will power their API: starter code built with Maven, Java 8, Spring Boot, JPA, and SQLite.
 
 #### Database
 
@@ -154,7 +152,10 @@ As part of this project, you must use this API to access film review data.  The 
 
 #### Relevant Documentation
 
-**TODO: relevant documentation here**
+* [Maven](http://maven.apache.org/guides/)
+* [Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
+* [JPA](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
+* [SQLite](https://www.sqlite.org/docs.html)
 
 ---
 
@@ -166,9 +167,7 @@ The FreshPotatoes tech team will look for:
 
 * **Production-level code**. - As you implement your solution, think about maintainability, extensibility, security, and performance.
 
-* **Consistent code**. To the best of your abilities, adhere to the styleguide provided.
-
-**TODO: add google styleguide**
+* **Consistent code**. To the best of your abilities, adhere to the [styleguide](https://google.github.io/styleguide/javaguide.html) provided.
 
 ---
 
