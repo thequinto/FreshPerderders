@@ -1,4 +1,4 @@
-package com.freshpotatoes.domain.entity;
+package co.ga.freshpotatoes.domain.entity;
 
 import javax.persistence.*;
 import java.util.Set;

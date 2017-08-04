@@ -1,4 +1,4 @@
-package com.freshpotatoes.config;
+package co.ga.freshpotatoes.config;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.SQLFunctionTemplate;

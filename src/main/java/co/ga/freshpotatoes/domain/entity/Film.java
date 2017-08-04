@@ -1,7 +1,10 @@
-package com.freshpotatoes.domain.entity;
+package co.ga.freshpotatoes.domain.entity;
 
 import javax.persistence.*;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 @Entity
 @Table(name = "films")
@@ -38,6 +41,7 @@ public class Film {
         this.title = title;
     }
 
+    @JsonIgnore
     public String getTagline() {
         return tagline;
     }
@@ -46,6 +50,7 @@ public class Film {
         this.tagline = tagline;
     }
 
+    @JsonIgnore
     public int getRevenue() {
         return revenue;
     }
@@ -54,6 +59,7 @@ public class Film {
         this.revenue = revenue;
     }
 
+    @JsonIgnore
     public int getBudget() {
         return budget;
     }
@@ -62,6 +68,7 @@ public class Film {
         this.budget = budget;
     }
 
+    @JsonIgnore
     public int getRuntime() {
         return runtime;
     }
@@ -70,6 +77,7 @@ public class Film {
         this.runtime = runtime;
     }
 
+    @JsonIgnore
     public String getStatus() {
         return status;
     }
@@ -78,6 +86,7 @@ public class Film {
         this.status = status;
     }
 
+    @JsonIgnore
     @Column(name = "original_language")
     public String getOriginalLanguage() {
         return originalLanguage;
@@ -98,6 +107,7 @@ public class Film {
 
     @ManyToOne
     @JoinColumn(name = "genre_id")
+    @JsonIgnore
     public Genre getGenre() {
         return genre;
     }
@@ -106,7 +116,15 @@ public class Film {
         this.genre = genre;
     }
 
+    @Transient
+    @JsonProperty("genre")
+    public String getGenreName() {
+      return genre.getName();
+    }
+
+
     @ManyToMany(mappedBy = "films")
+    @JsonIgnore
     public Set<Artist> getArtists() {
         return artists;
     }

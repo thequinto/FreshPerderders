@@ -1,8 +1,8 @@
-package com.freshpotatoes.domain.service;
+package co.ga.freshpotatoes.domain.service;
 
-import com.freshpotatoes.domain.entity.Artist;
-import com.freshpotatoes.domain.entity.Film;
-import com.freshpotatoes.domain.repository.ArtistRepository;
+import co.ga.freshpotatoes.domain.entity.Artist;
+import co.ga.freshpotatoes.domain.entity.Film;
+import co.ga.freshpotatoes.domain.repository.ArtistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
