@@ -23,12 +23,7 @@ public class FilmsController {
   private static final String template = "id=%s, offset=%s, limit=%s\n";
 
   @RequestMapping(value="/films/{film_id}/recommendations", method=RequestMethod.GET)
-  public Set<Film> recommendations(@PathVariable Long film_id,
-    @RequestParam(value="offset", defaultValue = "0") String offset,
-    @RequestParam(value="limit", defaultValue = "10") String limit) {
-      Film film = filmRepository.findOne(film_id);
-      Genre genre = genreRepository.findOne(film.getGenre().getId());
-
-      return genre.getFilms();
+  public Set<Film> recommendations(@PathVariable Long film_id) {
+      return new java.util.LinkedHashSet<Film>();
   }
 }
