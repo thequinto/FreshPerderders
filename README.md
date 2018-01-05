@@ -173,8 +173,7 @@ The FreshPotatoes tech team will look for:
 
 ## How To Submit Your Work
 
-Email your repository as a zip attachment to
-<a href="mailto:credentials@ga.co">credentials@ga.co</a>.  In the subject line, include your name and the company's name, if applicable.
+Email your work in a GitHub repository or Google Drive or Dropbox folder.  
 
 ---
 
