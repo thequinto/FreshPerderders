@@ -2,7 +2,7 @@ package co.ga.freshpotatoes.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties(ignoreUnknown = true, value = {"id", "author", "content", "rating"})
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"id", "author", "content"})
 public class Review {
     private long id;
     private String author;

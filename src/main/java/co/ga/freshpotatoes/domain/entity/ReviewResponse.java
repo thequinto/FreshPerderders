@@ -12,6 +12,14 @@ public class ReviewResponse {
     private long filmId;
     private List<Review> reviews;
 
+    public float getAvgRating() {
+        float sum = 0;
+        for (Review r : reviews) {
+            sum += r.getRating();
+        }
+        return sum / reviews.size();
+    }
+    
     public ReviewResponse() {}
 
     public long getFilmId() {
@@ -40,7 +48,8 @@ public class ReviewResponse {
             if (i.hasNext())
                 s.append(",\n\t");
         }
-        s.append("]}");
+        s.append("],\navgRating:").append(getAvgRating())
+        .append("}");
         return s.toString();
     }
 }
