@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.ga.freshpotatoes.domain.entity.Film;
@@ -23,6 +25,8 @@ import co.ga.freshpotatoes.domain.service.ReviewService;
 
 @RestController
 public class FilmsController {
+  private static final int DEFAULT_OFFSET = 0;
+  private static final int DEFAULT_LIMIT = 10;
   private static final Logger log = LoggerFactory.getLogger(FilmsController.class);
   @Autowired GenreRepository genreRepository;
   @Autowired FilmRepository filmRepository;
@@ -31,13 +35,15 @@ public class FilmsController {
   private static final String template = "id=%s, offset=%s, limit=%s\n";
 
   @RequestMapping(value="/films/{film_id}/recommendations", method=RequestMethod.GET)
-  public Set<Film> recommendations(@PathVariable Long film_id) throws ParseException {
-      return getRecommendationsWithinYears(film_id, 7.5);
+  public Set<Film> recommendations(@PathVariable Long film_id,
+          @RequestParam(value="offset", defaultValue = DEFAULT_OFFSET+"") String offset,
+          @RequestParam(value="limit", defaultValue = DEFAULT_LIMIT+"") String limit)  {
+      return getRecommendationsWithinYears(film_id, 7.5, limit, offset);
   }
   
-  private Set<Film> getRecommendationsWithinYears(Long film_id, double numYears) throws ParseException {
+  private Set<Film> getRecommendationsWithinYears(Long film_id, double numYears, String limit, String offset) {
       Film thisFilm = filmRepository.findOne(film_id);
-      log.info("searching for genre of: " + film_id);
+      log.info("searching for parent film: " + thisFilm);
       Genre genre = thisFilm.getGenre();
       log.info("searching for films of genre: " + genre);
       List<Film> filmsByGenre = filmRepository.findByGenre(genre);
@@ -46,18 +52,31 @@ public class FilmsController {
       StringBuilder s = new StringBuilder();
       for (Film f : films)
           s.append(f.getId() + " ");
-      log.info("found in these highly rated films in the same genre: " + s);
+      log.info("found these highly rated films in the same genre: " + s);
       // remove films outside 15 years
       double RANGE = numYears*365.25*24*60*60*1000;
       DateFormat df = new SimpleDateFormat("YYYY-MM-dd");
-      Date thisDate = df.parse(thisFilm.getReleaseDate());
-      for (Film f : films) {
-          Date releaseDate = df.parse(f.getReleaseDate());
-          if (Math.abs(thisDate.getTime() - releaseDate.getTime()) > RANGE) {
-              films.remove(f);
+      try {
+          Date thisDate = df.parse(thisFilm.getReleaseDate());
+          Set<Film> unrelatedFilms = new HashSet<>();
+          for (Film f : films) {
+              try {
+                  Date releaseDate = df.parse(f.getReleaseDate());
+                  if (Math.abs(thisDate.getTime() - releaseDate.getTime()) > RANGE) {
+                      log.info("this film is outside the date range: " + f);
+                      unrelatedFilms.add(f);
+                  }
+              } catch (ParseException e) {
+                  log.warn("parsed and ignored a bad release date for film: " + f.getId());
+                  e.printStackTrace();
+              }
           }
+          films.removeAll(unrelatedFilms);
+          log.info("removed films outside of +-" + RANGE + " ms");
+      } catch (ParseException e) {
+          log.warn("parsed a bad release date for parent film: " + thisFilm.getId());
+          e.printStackTrace();
       }
-      log.info("removed films outside of +-" + RANGE + " ms");
       // remove the originally requested film
       films.remove(thisFilm);
       // finally sort by film ID
@@ -67,6 +86,19 @@ public class FilmsController {
             return (int)(o1.getId() - o2.getId());
         }
       });
-      return new java.util.LinkedHashSet<Film>(films);
+      int ioffset = DEFAULT_OFFSET;
+      int ilimit = DEFAULT_LIMIT;
+      try {
+          ioffset = Integer.parseInt(offset);
+          if (ioffset < 0 || ioffset >= films.size()) ioffset = DEFAULT_OFFSET;
+      } catch (NumberFormatException e) {
+          log.warn("NFE when parsing requested offset");
+      }
+      try {
+          ilimit = Integer.parseInt(limit);
+      } catch (NumberFormatException e) {
+          log.warn("NFE when parsing requested limit");
+      }
+      return new java.util.LinkedHashSet<Film>(films.subList(ioffset, ioffset+ilimit > films.size() ? films.size() : ioffset+ilimit));
   }
 }

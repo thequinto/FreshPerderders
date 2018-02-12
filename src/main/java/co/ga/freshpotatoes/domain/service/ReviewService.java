@@ -26,7 +26,7 @@ public class ReviewService {
         for (ReviewResponse r : responses) {
             filteredFilmIds.add((int)r.getFilmId());
         }
-        List<Film> filteredFilms = new LinkedList<>(films);
+        List<Film> filteredFilms = new LinkedList<>();
         for (Film f : films) {
             if (filteredFilmIds.contains((int)f.getId())) {
                 filteredFilms.add(f);
