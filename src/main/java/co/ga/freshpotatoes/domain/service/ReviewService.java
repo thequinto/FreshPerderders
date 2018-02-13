@@ -1,9 +1,11 @@
 package co.ga.freshpotatoes.domain.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -11,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import co.ga.freshpotatoes.domain.data.ReviewResponse;
 import co.ga.freshpotatoes.domain.entity.Film;
-import co.ga.freshpotatoes.domain.entity.ReviewResponse;
 
 @Service
 public class ReviewService {
@@ -22,14 +24,19 @@ public class ReviewService {
     
     public List<Film> filterFilmsByReviews(List<Film> films, int minReviews, float minRating) {
         List<ReviewResponse> responses = getReviews(films, minReviews, minRating);
-        Set<Integer> filteredFilmIds = new HashSet<>();
+        Set<Long> filteredFilmIds = new HashSet<>();
+        Map<Long, ReviewResponse> responsesMap = new HashMap<>();
         for (ReviewResponse r : responses) {
-            filteredFilmIds.add((int)r.getFilmId());
+            filteredFilmIds.add(r.getFilmId());
+            responsesMap.put(r.getFilmId(), r);
         }
         List<Film> filteredFilms = new LinkedList<>();
         for (Film f : films) {
-            if (filteredFilmIds.contains((int)f.getId())) {
+            if (filteredFilmIds.contains(f.getId())) {
                 filteredFilms.add(f);
+                ReviewResponse response = responsesMap.get(f.getId());
+                f.setAverageRating(response.getAvgRating());
+                f.setReviews(response.getReviews().size());
             }
         }
         return filteredFilms;

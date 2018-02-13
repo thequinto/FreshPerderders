@@ -1,13 +1,16 @@
-package co.ga.freshpotatoes.domain.entity;
+package co.ga.freshpotatoes.domain.data;
 
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import co.ga.freshpotatoes.domain.entity.Review;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ReviewResponse {
+public class ReviewResponse extends Response {
     @JsonProperty(value = "film_id")
     private long filmId;
     private List<Review> reviews;
@@ -17,7 +20,8 @@ public class ReviewResponse {
         for (Review r : reviews) {
             sum += r.getRating();
         }
-        return sum / reviews.size();
+        DecimalFormat df = new DecimalFormat("#.#");
+        return Float.parseFloat(df.format(sum / reviews.size()));
     }
     
     public ReviewResponse() {}

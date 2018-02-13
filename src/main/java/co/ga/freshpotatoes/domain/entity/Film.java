@@ -20,6 +20,8 @@ public class Film {
     private String originalLanguage;
     private String releaseDate;
     private Set<Artist> artists;
+    private float averageRating;
+    private int reviews;
 
     public Film() {}
 
@@ -131,6 +133,24 @@ public class Film {
 
     public void setArtists(Set<Artist> artists) {
         this.artists = artists;
+    }
+
+    @Transient
+    public float getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(float averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    @Transient
+    public int getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(int reviews) {
+        this.reviews = reviews;
     }
 
     @Override

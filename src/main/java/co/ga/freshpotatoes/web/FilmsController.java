@@ -11,12 +11,16 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.ga.freshpotatoes.domain.data.ErrorResponse;
+import co.ga.freshpotatoes.domain.data.RecommendedResponse;
+import co.ga.freshpotatoes.domain.data.Response;
 import co.ga.freshpotatoes.domain.entity.Film;
 import co.ga.freshpotatoes.domain.entity.Genre;
 import co.ga.freshpotatoes.domain.repository.FilmRepository;
@@ -32,18 +36,17 @@ public class FilmsController {
   @Autowired FilmRepository filmRepository;
   @Autowired ReviewService reviewService;
 
-  private static final String template = "id=%s, offset=%s, limit=%s\n";
-
   @RequestMapping(value="/films/{film_id}/recommendations", method=RequestMethod.GET)
-  public Set<Film> recommendations(@PathVariable Long film_id,
+  public Response recommendations(@PathVariable Long film_id,
           @RequestParam(value="offset", defaultValue = DEFAULT_OFFSET+"") String offset,
           @RequestParam(value="limit", defaultValue = DEFAULT_LIMIT+"") String limit)  {
       return getRecommendationsWithinYears(film_id, 7.5, limit, offset);
   }
   
-  private Set<Film> getRecommendationsWithinYears(Long film_id, double numYears, String limit, String offset) {
+  private Response getRecommendationsWithinYears(Long film_id, double numYears, String limit, String offset) {
       Film thisFilm = filmRepository.findOne(film_id);
       log.info("searching for parent film: " + thisFilm);
+      if (thisFilm == null) return new ErrorResponse("parent film not found");
       Genre genre = thisFilm.getGenre();
       log.info("searching for films of genre: " + genre);
       List<Film> filmsByGenre = filmRepository.findByGenre(genre);
@@ -86,19 +89,28 @@ public class FilmsController {
             return (int)(o1.getId() - o2.getId());
         }
       });
-      int ioffset = DEFAULT_OFFSET;
-      int ilimit = DEFAULT_LIMIT;
+      int intOffset = DEFAULT_OFFSET;
+      int intLimit = DEFAULT_LIMIT;
       try {
-          ioffset = Integer.parseInt(offset);
-          if (ioffset < 0 || ioffset >= films.size()) ioffset = DEFAULT_OFFSET;
+          intOffset = Integer.parseInt(offset);
+          if (intOffset < 0) {
+              return new ErrorResponse("negative offset");
+          }
+          if (intOffset >= films.size()) {
+              log.warn("offset out of bounds, resetting to default: " + DEFAULT_OFFSET);
+              intOffset = DEFAULT_OFFSET;
+          }
       } catch (NumberFormatException e) {
           log.warn("NFE when parsing requested offset");
+          return new ErrorResponse("exceptional number format for offset parameter");
       }
       try {
-          ilimit = Integer.parseInt(limit);
+          intLimit = Integer.parseInt(limit);
       } catch (NumberFormatException e) {
           log.warn("NFE when parsing requested limit");
+          return new ErrorResponse("exceptional number format for limit parameter");
       }
-      return new java.util.LinkedHashSet<Film>(films.subList(ioffset, ioffset+ilimit > films.size() ? films.size() : ioffset+ilimit));
+      Set<Film> recFilms = new java.util.LinkedHashSet<>(films.subList(intOffset, intOffset+intLimit > films.size() ? films.size() : intOffset+intLimit));
+      return new RecommendedResponse(recFilms, limit, offset);
   }
 }
